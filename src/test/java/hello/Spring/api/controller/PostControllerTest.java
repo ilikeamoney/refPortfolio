@@ -4,14 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.Spring.api.domain.Post;
 import hello.Spring.api.repository.PostRepository;
 import hello.Spring.api.request.PostCreate;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -34,7 +35,7 @@ class PostControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @AfterEach
+    @BeforeEach
     void deleteAll() {
         postRepository.deleteAll();
     }
@@ -128,31 +129,51 @@ class PostControllerTest {
     @DisplayName("글 여러개 조회")
     public void test5() throws Exception {
         //given
-        Post requestPost1 = Post.builder()
-                .title("title_1")
-                .content("content_1")
-                .build();
-
-        postRepository.save(requestPost1);
-
-        Post requestPost2 = Post.builder()
-                .title("title_2")
-                .content("content_2")
-                .build();
-
-        postRepository.save(requestPost2);
+        List<Post> requestPosts = IntStream.range(0, 30)
+                .mapToObj(i -> {
+                    return Post.builder()
+                            .title("제목 - " + i)
+                            .content("내용 - " + i)
+                            .build();
+                })
+                .collect(Collectors.toList());
+        postRepository.saveAll(requestPosts);
 
         //when
-        mockMvc.perform(get("/posts")
+        // 웹 요청으로 정렬 조건을 넘길때
+        mockMvc.perform(get("/posts?page=1&size=10")
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()", is(2)))
-                .andExpect(jsonPath("$[0].id").value(requestPost1.getId()))
-                .andExpect(jsonPath("$[0].title").value("title_1"))
-                .andExpect(jsonPath("$[0].content").value("content_1"))
-                .andExpect(jsonPath("$[1].id").value(requestPost2.getId()))
-                .andExpect(jsonPath("$[1].title").value("title_2"))
-                .andExpect(jsonPath("$[1].content").value("content_2"))
+                .andExpect(jsonPath("$.length()", is(10)))
+                .andExpect(jsonPath("$[0].id").value(30))
+                .andExpect(jsonPath("$[0].title").value("제목 - 29"))
+                .andExpect(jsonPath("$[0].content").value("내용 - 29"))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("0 페이지로 요청")
+    public void test6() throws Exception {
+        //given
+        List<Post> requestPosts = IntStream.range(0, 30)
+                .mapToObj(i -> {
+                    return Post.builder()
+                            .title("제목 - " + i)
+                            .content("내용 - " + i)
+                            .build();
+                })
+                .collect(Collectors.toList());
+        postRepository.saveAll(requestPosts);
+
+        //when
+        // 웹 요청으로 정렬 조건을 넘길때
+        mockMvc.perform(get("/posts?page=0&size=10")
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()", is(10)))
+                .andExpect(jsonPath("$[0].id").value(30))
+                .andExpect(jsonPath("$[0].title").value("제목 - 29"))
+                .andExpect(jsonPath("$[0].content").value("내용 - 29"))
                 .andDo(print());
     }
 

@@ -2,6 +2,7 @@ package hello.Spring.api.service;
 
 import hello.Spring.api.domain.Post;
 import hello.Spring.api.repository.PostRepository;
+import hello.Spring.api.request.PostSearch;
 import hello.Spring.api.response.PostResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -23,6 +26,13 @@ class PostServiceTest {
 
     @Autowired
     PostRepository postRepository;
+
+    private static Post apply(int i) {
+        return Post.builder()
+                .title("제목 - " + i)
+                .content("내용 - " + i)
+                .build();
+    }
 
     @Test
     @DisplayName("글 작성")
@@ -65,28 +75,30 @@ class PostServiceTest {
         Assertions.assertThat(post.getContent()).isEqualTo("bar");
     }
 
+    
     @Test
-    @DisplayName("글 여러개 조회")
-    public void test3() throws Exception {
+    @DisplayName("1 페이지 조회")
+    public void test4() throws Exception {
         //given
+        List<Post> requestPosts = IntStream.range(0, 30)
+                .mapToObj(i -> {
+                    return Post.builder()
+                            .title("제목 - " + i)
+                            .content("내용 - " + i)
+                            .build();
+                })
+                .collect(Collectors.toList());
+        postRepository.saveAll(requestPosts);
 
-        postRepository.saveAll(
-                List.of(
-                Post.builder()
-                        .title("foo1")
-                        .content("bar1")
-                        .build(),
-
-                Post.builder()
-                        .title("foo2")
-                        .content("bar2")
-                        .build())
-        );
+        PostSearch pageable = PostSearch.builder()
+                .build();
 
         //when
-        List<PostResponse> posts = postService.getList();
+        List<PostResponse> posts = postService.getList(pageable);
 
         //then
-        Assertions.assertThat(posts.size()).isEqualTo(2);
+        assertThat(posts.size()).isEqualTo(10);
+        assertThat(posts.get(0).getContent()).isEqualTo("내용 - 29");
+        assertThat(posts.get(9).getContent()).isEqualTo("내용 - 20");
     }
 }

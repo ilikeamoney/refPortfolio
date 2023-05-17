@@ -3,6 +3,7 @@ package hello.Spring.api.service;
 import hello.Spring.api.domain.Post;
 import hello.Spring.api.repository.PostRepository;
 import hello.Spring.api.request.PostCreate;
+import hello.Spring.api.request.PostSearch;
 import hello.Spring.api.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,8 +39,11 @@ public class PostService {
                 .build();
     }
 
-    public List<PostResponse> getList() {
-        return postRepository.findAll().stream()
+    public List<PostResponse> getList(PostSearch postSearch) {
+        // 페이징 정렬조건 추가하는 방법
+//        Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "id"));
+
+        return postRepository.getList(postSearch).stream()
                 .map(PostResponse::new)
                 .collect(Collectors.toList());
     }

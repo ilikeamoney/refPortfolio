@@ -1,6 +1,7 @@
 package hello.Spring.api.controller;
 
 import hello.Spring.api.request.PostCreate;
+import hello.Spring.api.request.PostSearch;
 import hello.Spring.api.response.PostResponse;
 import hello.Spring.api.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -34,8 +35,8 @@ public class PostController {
     }
 
     @GetMapping("/posts")
-    public List<PostResponse> all() {
-        return postService.getList();
+    public List<PostResponse> getList(@ModelAttribute PostSearch postSearch) {
+        return postService.getList(postSearch);
     }
 
 }
