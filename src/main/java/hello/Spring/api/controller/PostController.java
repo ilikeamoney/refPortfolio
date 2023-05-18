@@ -1,6 +1,7 @@
 package hello.Spring.api.controller;
 
 import hello.Spring.api.request.PostCreate;
+import hello.Spring.api.request.PostEdit;
 import hello.Spring.api.request.PostSearch;
 import hello.Spring.api.response.PostResponse;
 import hello.Spring.api.service.PostService;
@@ -37,6 +38,16 @@ public class PostController {
     @GetMapping("/posts")
     public List<PostResponse> getList(@ModelAttribute PostSearch postSearch) {
         return postService.getList(postSearch);
+    }
+
+    @PatchMapping("/posts/{postId}")
+    public PostResponse edit(@PathVariable Long postId, @RequestBody @Valid PostEdit postEdit) {
+        return postService.edit(postId, postEdit);
+    }
+
+    @DeleteMapping("/posts/{postId}")
+    public void delete(@PathVariable Long postId) {
+        postService.delete(postId);
     }
 
 }

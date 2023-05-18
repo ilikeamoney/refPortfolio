@@ -21,9 +21,21 @@ public class Post {
     @Lob
     private String content;
 
+
     @Builder
     public Post(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+    public PostEditor.PostEditorBuilder toEditor() {
+        return PostEditor.builder()
+                .title(this.title)
+                .content(this.content);
+    }
+
+    public void updatePost(PostEditor postEditor) {
+        title = postEditor.getTitle() != null ? postEditor.getTitle() : this.title;
+        content = postEditor.getContent() != null ? postEditor.getContent() : this.content;
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import hello.Spring.api.domain.Post;
 import hello.Spring.api.repository.PostRepository;
 import hello.Spring.api.request.PostCreate;
+import hello.Spring.api.request.PostEdit;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,10 +18,11 @@ import java.util.stream.IntStream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+
 
 @AutoConfigureMockMvc
 @SpringBootTest
@@ -36,13 +38,19 @@ class PostControllerTest {
     private MockMvc mockMvc;
 
     @BeforeEach
-    void deleteAll() {
+    void BeforeDeleteAllPost() {
         postRepository.deleteAll();
     }
 
+    @AfterEach
+    void AfterDeleteAllPost() {
+        postRepository.deleteAll();
+    }
+
+
     @Test
     @DisplayName("/posts 요청시 Hello World ! 출력한다.")
-    public void test() throws Exception {
+    void test() throws Exception {
         //given
         String json = objectMapper.writeValueAsString(PostCreate.builder()
                 .title("제목입니다.")
@@ -61,7 +69,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("/posts 요청시 title 값은 필수.")
-    public void test2() throws Exception {
+    void test2() throws Exception {
         //given
         String request = objectMapper.writeValueAsString(
                 PostCreate.builder()
@@ -82,7 +90,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("/posts 요청시 DB에 값이 저장된다.")
-    public void test3() throws Exception {
+    void test3() throws Exception {
         //given
         String request = objectMapper.writeValueAsString(
                 PostCreate.builder()
@@ -108,7 +116,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 1개 조회")
-    public void test4() throws Exception {
+    void test4() throws Exception {
         //given
         Post request = postRepository.save(Post.builder()
                 .title("123456789012345")
@@ -127,7 +135,7 @@ class PostControllerTest {
 
     @Test
     @DisplayName("글 여러개 조회")
-    public void test5() throws Exception {
+    void test5() throws Exception {
         //given
         List<Post> requestPosts = IntStream.range(0, 30)
                 .mapToObj(i -> {
@@ -146,14 +154,14 @@ class PostControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(10)))
                 .andExpect(jsonPath("$[0].id").value(30))
-                .andExpect(jsonPath("$[0].title").value("제목 - 29"))
-                .andExpect(jsonPath("$[0].content").value("내용 - 29"))
+                .andExpect(jsonPath("$[0].title").value(requestPosts.get(29).getTitle()))
+                .andExpect(jsonPath("$[0].content").value(requestPosts.get(29).getContent()))
                 .andDo(print());
     }
 
     @Test
     @DisplayName("0 페이지로 요청")
-    public void test6() throws Exception {
+    void test6() throws Exception {
         //given
         List<Post> requestPosts = IntStream.range(0, 30)
                 .mapToObj(i -> {
@@ -172,8 +180,75 @@ class PostControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(10)))
                 .andExpect(jsonPath("$[0].id").value(30))
-                .andExpect(jsonPath("$[0].title").value("제목 - 29"))
-                .andExpect(jsonPath("$[0].content").value("내용 - 29"))
+                .andExpect(jsonPath("$[0].title").value(requestPosts.get(29).getTitle()))
+                .andExpect(jsonPath("$[0].content").value(requestPosts.get(29).getContent()))
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 제목 수정")
+    void test7() throws Exception {
+        //given
+        Post post = Post.builder()
+                .title("제목")
+                .content("내용")
+                .build();
+        postRepository.save(post);
+
+        PostEdit  editPost = PostEdit.builder()
+                .title("수정한 제목")
+                .content("내용")
+                .build();
+
+        //when
+        // 웹 요청으로 정렬 조건을 넘길때
+        mockMvc.perform(patch("/posts/{postId}", post.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(editPost)))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 제목 수정")
+    void test8() throws Exception {
+        //given
+        Post post = Post.builder()
+                .title("제목")
+                .content("내용")
+                .build();
+        postRepository.save(post);
+
+        PostEdit  editPost = PostEdit.builder()
+                .title(null)
+                .content("수정한 내용")
+                .build();
+
+        //when
+        // 웹 요청으로 정렬 조건을 넘길때
+        mockMvc.perform(patch("/posts/{postId}", post.getId())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(editPost)))
+                .andExpect(jsonPath("$.title").value("제목"))
+                .andExpect(jsonPath("$.content").value("수정한 내용"))
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
+    @Test
+    @DisplayName("글 삭제")
+    void test9() throws Exception {
+        //given
+        Post post = Post.builder()
+                .title("제목 입니다.")
+                .content("내용 입니다.")
+                .build();
+        postRepository.save(post);
+
+        //expect
+        mockMvc.perform(delete("/posts/{postId}", post.getId())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andDo(print());
     }
 

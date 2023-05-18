@@ -18,7 +18,6 @@ public class PostSearch {
 
     private final int MAX_SIZE = 2000;
 
-
     @Builder.Default
     private int page = 1;
     @Builder.Default
