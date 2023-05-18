@@ -28,13 +28,13 @@ public class Post {
         this.content = content;
     }
 
-    public PostEditor.PostEditorBuilder toEditor() {
+    public PostEditor.PostEditorBuilder callEditor() {
         return PostEditor.builder()
                 .title(this.title)
                 .content(this.content);
     }
 
-    public void updatePost(PostEditor postEditor) {
+    public void editPost(PostEditor postEditor) {
         title = postEditor.getTitle() != null ? postEditor.getTitle() : this.title;
         content = postEditor.getContent() != null ? postEditor.getContent() : this.content;
     }

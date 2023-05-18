@@ -14,7 +14,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-
     /**
      * 페이징 처리 코드
      */

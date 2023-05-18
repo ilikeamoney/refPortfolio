@@ -58,17 +58,17 @@ public class PostService {
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글 입니다."));
 
         // 아직 빌드되지 않은 PostEditor 를 반환한다. (현재 Post Entity 의 내용을 담음)
-        PostEditor.PostEditorBuilder toEdit = post.toEditor();
+        PostEditor.PostEditorBuilder modifyPost = post.callEditor();
 
         // 파라미터로 넘어온 postEdit(수정 내용을 담은 DTO)
         // PostEditor 내용을 변경
-        PostEditor editPost = toEdit
+        PostEditor updatePost = modifyPost
                 .title(postEdit.getTitle()) // null
                 .content(postEdit.getContent()) // null
                 .build();
 
         // 실제 엔티티의 내용을 변경
-        post.updatePost(editPost);
+        post.editPost(updatePost);
         return new PostResponse(post);
     }
 
