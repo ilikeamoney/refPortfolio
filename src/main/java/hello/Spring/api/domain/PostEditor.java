@@ -15,4 +15,12 @@ public class PostEditor {
         this.title = title;
         this.content = content;
     }
+
+
+//    public static PostEditor.PostEditorBuilder callEditor(PostEdit postEdit) {
+//        return PostEditor.builder()
+//                .title(postEdit.getTitle())
+//                .content(postEdit.getContent());
+//    }
+
 }

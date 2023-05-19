@@ -14,6 +14,8 @@ plugins {
 
 	// add querydsl
 	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+
+	id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 group = 'hello'
@@ -24,44 +26,69 @@ configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
+
+	asciidoctorExt
 }
 
 repositories {
 	mavenCentral()
 }
 
+ext {
+	snippetsDir = file('build/generated-snippets')
+}
+
+
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	compileOnly 'org.projectlombok:lombok'
+	runtimeOnly 'com.h2database:h2'
+
+	//REST DOC
+	asciidoctorExt "org.springframework.restdocs:spring-restdocs-asciidoctor"
+	testImplementation "org.springframework.restdocs:spring-restdocs-mockmvc"
 
 	// add querydsl
 	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
 	annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
 
-	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.h2database:h2'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
+	outputs.dir snippetsDir
+}
+
+asciidoctor {
+	inputs.dir snippetsDir
+	configurations 'asciidoctorExt'
+	dependsOn test
 }
 
 // add querydsl
 def querydslDir = "$buildDir/generated/querydsl"
+
 querydsl {
 	jpa = true
 	querydslSourcesDir = querydslDir
 }
+
 sourceSets {
 	main.java.srcDir querydslDir
 }
-configurations {
-	querydsl.extendsFrom compileClasspath
-}
-compileQuerydsl {
+
+compileQuerydsl{
 	options.annotationProcessorPath = configurations.querydsl
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
 }
 

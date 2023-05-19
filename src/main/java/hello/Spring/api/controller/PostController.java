@@ -13,8 +13,19 @@ import javax.validation.Valid;
 import java.util.List;
 
 /**
- * /posts -> 글 전체조회
- * /posts/{postId} -> 단건 조회
+ * API 문서 생성
+ *
+ * 한건 조회 -> GET /posts/{postId}
+ * 게시글 등록 -> POST /posts
+ * 게시글 목록 조회 -> GET /posts
+ * 게시글 수정 -> PATCH /posts/{postId}
+ * 게시글 삭제 -> DELETE /posts/{postId}
+ *
+ * RestDoc 장점
+ * 운영코드에 영향 X
+ * 코드를 수정하고 테스트 케이스에서 통과가 되면 RestDoc 는 테스트 기반으로 문서를 수정한다.
+ * (즉 코드수정을 하면 문서도 수정을 해야 스펙이 일치하지만 RestDoc 는 코드를 수정하면 문서가 테스트 기반으로 자동 수정된다.)
+ *
  */
 
 
@@ -42,7 +53,7 @@ public class PostController {
     }
 
     @PatchMapping("/posts/{postId}")
-    public PostResponse edit(@PathVariable Long postId, @RequestBody @Valid PostEdit postEdit) {
+    public PostResponse edit(@PathVariable Long postId, @RequestBody PostEdit postEdit) {
         return postService.edit(postId, postEdit);
     }
 

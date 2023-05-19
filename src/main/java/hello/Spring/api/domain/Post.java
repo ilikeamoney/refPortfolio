@@ -1,5 +1,6 @@
 package hello.Spring.api.domain;
 
+import hello.Spring.api.request.PostEdit;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,14 +29,8 @@ public class Post {
         this.content = content;
     }
 
-    public PostEditor.PostEditorBuilder callEditor() {
-        return PostEditor.builder()
-                .title(this.title)
-                .content(this.content);
-    }
-
-    public void editPost(PostEditor postEditor) {
-        title = postEditor.getTitle() != null ? postEditor.getTitle() : this.title;
-        content = postEditor.getContent() != null ? postEditor.getContent() : this.content;
+    public void editPost(PostEdit postEdit) {
+        title = postEdit.getTitle() != null ? postEdit.getTitle() : this.title;
+        content = postEdit.getContent() != null ? postEdit.getContent() : this.content;
     }
 }

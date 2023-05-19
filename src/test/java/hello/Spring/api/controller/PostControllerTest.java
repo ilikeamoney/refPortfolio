@@ -153,7 +153,7 @@ class PostControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(10)))
-                .andExpect(jsonPath("$[0].id").value(30))
+                .andExpect(jsonPath("$[0].id").value(33))
                 .andExpect(jsonPath("$[0].title").value(requestPosts.get(29).getTitle()))
                 .andExpect(jsonPath("$[0].content").value(requestPosts.get(29).getContent()))
                 .andDo(print());
@@ -179,7 +179,7 @@ class PostControllerTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()", is(10)))
-                .andExpect(jsonPath("$[0].id").value(30))
+                .andExpect(jsonPath("$[0].id").value(63))
                 .andExpect(jsonPath("$[0].title").value(requestPosts.get(29).getTitle()))
                 .andExpect(jsonPath("$[0].content").value(requestPosts.get(29).getContent()))
                 .andDo(print());
