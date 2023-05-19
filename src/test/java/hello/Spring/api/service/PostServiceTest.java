@@ -1,11 +1,13 @@
 package hello.Spring.api.service;
 
 import hello.Spring.api.domain.Post;
+import hello.Spring.api.exception.PostNotFound;
 import hello.Spring.api.repository.PostRepository;
 import hello.Spring.api.request.PostEdit;
 import hello.Spring.api.request.PostSearch;
 import hello.Spring.api.response.PostResponse;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 class PostServiceTest {
@@ -25,6 +28,11 @@ class PostServiceTest {
 
     @Autowired
     PostRepository postRepository;
+
+    @BeforeEach
+    void deletePost() {
+        postRepository.deleteAll();
+    }
 
     private static Post apply(int i) {
         return Post.builder()
@@ -43,10 +51,9 @@ class PostServiceTest {
                 .build();
 
         //when
-        Post savePost = postRepository.save(postCreate);
+        postRepository.save(postCreate);
 
         //then
-        Assertions.assertThat(postRepository.count()).isEqualTo(savePost.getId());
         Post post = postRepository.findAll().get(0);
         assertThat(postRepository.count()).isEqualTo(1);
         assertThat(post.getTitle()).isEqualTo("제목입니다.");
@@ -164,9 +171,59 @@ class PostServiceTest {
         postService.delete(post.getId());
 
         //then
-        Assertions.assertThatThrownBy(() -> postService.get(post.getId()))
-                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> postService.get(post.getId()))
+                .isInstanceOf(PostNotFound.class);
 
         assertThat(postRepository.count()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("글 한개 조회 - 존재하지 않는 글")
+    public void test8() throws Exception {
+        //given
+        Post requestPost = Post.builder()
+                .title("제목입니다.")
+                .content("내용입니다.")
+                .build();
+
+        postRepository.save(requestPost);
+
+        //expected
+        Assertions.assertThatThrownBy(() -> postService.get(requestPost.getId() + 1L))
+                .isInstanceOf(PostNotFound.class);
+    }
+
+    @Test
+    @DisplayName("글 삭제 - 존재하지 않는 글")
+    void test9() throws Exception {
+        //given
+        Post post = Post.builder()
+                .title("제목 입니다.")
+                .content("내용 입니다.")
+                .build();
+        postRepository.save(post);
+
+        //expected
+        assertThatThrownBy(() -> postService.delete(post.getId() + 1L))
+                .isInstanceOf(PostNotFound.class);
+    }
+
+    @Test
+    @DisplayName("글 내용 수정 - 존재하지 않는 글")
+    public void test10() throws Exception {
+        //given
+        Post post = Post.builder()
+                .title("제목")
+                .content("내용")
+                .build();
+        postRepository.save(post);
+
+        PostEdit editPost = PostEdit.builder()
+                .content("수정한 내용")
+                .build();
+
+        //expected
+        assertThatThrownBy(() -> postService.edit(post.getId() + 1L, editPost))
+                .isInstanceOf(PostNotFound.class);
     }
 }

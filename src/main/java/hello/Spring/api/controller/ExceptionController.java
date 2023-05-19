@@ -1,8 +1,10 @@
 package hello.Spring.api.controller;
 
+import hello.Spring.api.exception.SuperException;
 import hello.Spring.api.response.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -41,4 +43,26 @@ public class ExceptionController {
 
         return response;
     }
+
+    @ResponseBody
+    @ExceptionHandler(SuperException.class)
+    public ResponseEntity<ErrorResponse> postNotFound(SuperException e) {
+        int statusCode = e.getStatusCode();
+
+        ErrorResponse responseBody = ErrorResponse.builder()
+                .code(String.valueOf(statusCode))
+                .message(e.getMessage())
+                // 셋팅된 Map 이 ErrorResponse 에 필드에 셋팅된다.
+                .validation(e.getValidate())
+                .build();
+
+        // 추상화한 예외의 타입을 세밀하게 검증해서 에러 메세지 추가
+
+
+        ResponseEntity<ErrorResponse> response = ResponseEntity.status(statusCode)
+                .body(responseBody);
+
+        return response;
+    }
+
 }

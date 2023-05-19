@@ -2,6 +2,7 @@ package hello.Spring.api.service;
 
 import hello.Spring.api.domain.Post;
 import hello.Spring.api.domain.PostEditor;
+import hello.Spring.api.exception.PostNotFound;
 import hello.Spring.api.repository.PostRepository;
 import hello.Spring.api.request.PostCreate;
 import hello.Spring.api.request.PostEdit;
@@ -34,7 +35,7 @@ public class PostService {
 
     public PostResponse get(Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 글 아이디입니다."));
+                .orElseThrow(PostNotFound::new);
 
         return PostResponse.builder()
                 .id(post.getId())
@@ -55,7 +56,7 @@ public class PostService {
     @Transactional
     public PostResponse edit(Long postId, PostEdit postEdit) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글 입니다."));
+                .orElseThrow(PostNotFound::new);
 
         // 아직 빌드되지 않은 PostEditor 를 반환한다. (현재 Post Entity 의 내용을 담음)
         PostEditor.PostEditorBuilder modifyPost = post.callEditor();
@@ -76,7 +77,7 @@ public class PostService {
     public void delete(Long postId) {
         Post findPost = postRepository
                 .findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("찾으시는 게시글이 없습니다."));
+                .orElseThrow(PostNotFound::new);
 
         postRepository.delete(findPost);
     }

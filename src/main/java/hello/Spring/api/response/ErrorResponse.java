@@ -2,7 +2,6 @@ package hello.Spring.api.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,22 +17,24 @@ import java.util.Map;
  *         "content" : "...."
  *     }
  * }
+ *
+ * @JsonInclude 응답 json 결과를 필터링하는 애노테이션
+ * @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
  */
 @Getter
-@Setter
-@Builder
 public class ErrorResponse {
 
     private final String code;
 
     private final String message;
 
-    private final Map<String, String> validation = new HashMap<>();
+    private final Map<String, String> validation;
 
     @Builder
-    public ErrorResponse(String code, String message) {
+    public ErrorResponse(String code, String message, Map<String, String> validation) {
         this.code = code;
         this.message = message;
+        this.validation = validation != null ? validation : new HashMap<>();
     }
 
     public void addValidation(String fieldName, String errorMessage) {

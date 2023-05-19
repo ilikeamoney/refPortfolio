@@ -1,5 +1,6 @@
 package hello.Spring.api.request;
 
+import hello.Spring.api.exception.InvalidRequest;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -32,5 +33,13 @@ public class PostCreate {
     public PostCreate(String title, String content) {
         this.title = title;
         this.content = content;
+    }
+
+
+    // 요청 자체에서 검증하는 코드
+    public void validate() {
+        if (title.contains("씨발")) {
+            throw new InvalidRequest("title", "씨발은 제목으로 사용할 수 없습니다.");
+        }
     }
 }
