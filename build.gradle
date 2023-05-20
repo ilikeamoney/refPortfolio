@@ -27,7 +27,7 @@ configurations {
 		extendsFrom annotationProcessor
 	}
 
-	asciidoctorExt
+	asciidoctorExtensions // dependencies 에서 적용한 것 추가
 }
 
 repositories {
@@ -47,7 +47,7 @@ dependencies {
 	runtimeOnly 'com.h2database:h2'
 
 	//REST DOC
-	asciidoctorExt "org.springframework.restdocs:spring-restdocs-asciidoctor"
+	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
 	testImplementation "org.springframework.restdocs:spring-restdocs-mockmvc"
 
 	// add querydsl
@@ -64,9 +64,41 @@ tasks.named('test') {
 }
 
 asciidoctor {
+	// 위에서 작성한 configuration 적용
+	configurations 'asciidoctorExtensions'
+
+	// source가 없으면 .adoc파일을 전부 html로 만들어버림
+	// source 지정시 특정 adoc만 HTML로 만든다.
+	sources{
+		include("**/index.adoc","**/common/*.adoc")
+	}
+
+	// 특정 .adoc에 다른 adoc 파일을 가져와서(include) 사용하고 싶을 경우 경로를 baseDir로 맞춰주는 설정
+	// (개별 adoc으로 운영한다면 필요 없는 옵션)
+	baseDirFollowsSourceFile()
+
+	// snippetsDir 를 입력으로 구성
 	inputs.dir snippetsDir
-	configurations 'asciidoctorExt'
+
+	// asciidoctor 전 test 실행!
 	dependsOn test
+
+}
+
+asciidoctor.doFirst {
+	delete file('src/main/resources/static/docs')
+}
+
+// asccidoctor 작업 이후 생성된 HTML 파일을 static/docs 로 copy
+task createDocument(type: Copy) {
+	dependsOn asciidoctor
+	from file("build/docs/asciidoc")
+	into file("src/main/resources/static")
+}
+
+// build 전 createDocument(REST Docs 문서화) 실행!
+build {
+	dependsOn createDocument
 }
 
 // add querydsl

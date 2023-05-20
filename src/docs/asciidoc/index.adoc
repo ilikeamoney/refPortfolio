@@ -1,4 +1,40 @@
-include::{snippets}/index/http-request.adoc[]
-include::{snippets}/index/http-response.adoc[]
-include::{snippets}/index/curl-request.adoc[]
-include::{snippets}/index/httpie-request.adoc[]
+= 인프런 호돌맨 REST doc API
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 1
+:sectlinks:
+
+== 글 단건조회
+
+== 요청
+include::{snippets}/post-inquiry/http-request.adoc[]
+
+=== 요청 파라미터
+include::{snippets}/post-inquiry/path-parameters.adoc[]
+
+
+== 응답
+include::{snippets}/post-inquiry/http-response.adoc[]
+
+=== 응답 결과
+include::{snippets}/post-inquiry/response-fields.adoc[]
+
+
+=== curl
+include::{snippets}/post-inquiry/curl-request.adoc[]
+
+=== httpie
+include::{snippets}/post-inquiry/httpie-request.adoc[]
+
+
+== 글 작성
+
+=== 요청
+include::{snippets}/post-create/http-request.adoc[]
+
+include::{snippets}/post-create/request-fields.adoc[]
+
+=== 응답
+include::{snippets}/post-create/http-response.adoc[]
