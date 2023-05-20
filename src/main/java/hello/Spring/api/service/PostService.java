@@ -67,6 +67,8 @@ public class PostService {
         // PostEditor 내용을 변경
 //        PostEditor updatePost = modifyPost.build();
 
+        System.out.println("hello world");
+
         // 실제 엔티티의 내용을 변경
         post.editPost(postEdit);
         return new PostResponse(post);
