@@ -1,23 +1,24 @@
 <script setup lang="ts">
+import {ref} from "vue";
 
-  import {ref} from "vue";
+import axios from "axios";
+import {useRouter} from "vue-router";
 
-  import axios from "axios";
-  import {useRouter} from "vue-router";
+const title = ref("")
+const content = ref("")
 
-  const title = ref("")
-  const content = ref("")
+const router = useRouter()
 
-  const router = useRouter()
-
-  const write = function () {
-    axios.post("/api/posts", {
-      title : title.value,
-      content : content.value
-    }).then(() => {
-          router.replace({name: "home"})
-        });
-  };
+const write = function () {
+  axios
+      .post("/api/posts", {
+        title : title.value,
+        content : content.value
+  })
+      .then(() => {
+        router.replace({name: "home"})
+      });
+};
 
 </script>
 
