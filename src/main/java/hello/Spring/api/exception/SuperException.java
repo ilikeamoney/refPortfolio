@@ -18,7 +18,6 @@ public abstract class SuperException extends RuntimeException {
         super(message, cause);
     }
 
-
     // 에러 코드 추상화
     public abstract int getStatusCode();
 
