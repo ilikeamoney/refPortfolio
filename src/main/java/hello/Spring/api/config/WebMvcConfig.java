@@ -30,6 +30,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final SessionRepository sessionRepository;
 
+    private final AppConfig appConfig;
+
     // 확장할 Interceptor 추가할때 구현하는 메소드
 //    @Override
 //    public void addInterceptors(InterceptorRegistry registry) {
@@ -41,6 +43,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     // 확장할 ArgumentResolver 추가할때 구현하는 메소드
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new AuthResolver(sessionRepository));
+        resolvers.add(new AuthResolver(sessionRepository, appConfig));
     }
 }

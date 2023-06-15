@@ -17,14 +17,25 @@ public class AuthService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public String signIn(Login request) {
+    public String signInToken(Login request) {
         Member member = memberRepository
                 .findByEmailAndPassword(request.getEmail(), request.getPassword())
                 .orElseThrow(InvalidSignInformation::new);
 
         Session session = member.addSession();
 
+        // 토큰값 반환
         return session.getAccessToken();
+    }
+
+    @Transactional
+    public Long signInId(Login request) {
+        Member member = memberRepository
+                .findByEmailAndPassword(request.getEmail(), request.getPassword())
+                .orElseThrow(InvalidSignInformation::new);
+
+        // Member Id 반환
+        return member.getId();
     }
 
 
