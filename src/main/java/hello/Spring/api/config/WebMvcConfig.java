@@ -1,5 +1,7 @@
 package hello.Spring.api.config;
 
+import hello.Spring.api.repository.SessionRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -23,7 +25,10 @@ import java.util.List;
  */
 
 @Configuration
+@RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
+
+    private final SessionRepository sessionRepository;
 
     // 확장할 Interceptor 추가할때 구현하는 메소드
 //    @Override
@@ -32,9 +37,10 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //                .excludePathPatterns("/error", "/favicon.ico");
 //    }
 
+
     // 확장할 ArgumentResolver 추가할때 구현하는 메소드
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new AuthResolver());
+        resolvers.add(new AuthResolver(sessionRepository));
     }
 }

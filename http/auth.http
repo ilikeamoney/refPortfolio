@@ -7,3 +7,8 @@ Content-Type: application/json
   "email":"ilikeamoney@gmail.com",
   "password": "1234"
 }
+
+### 인증페이지 요청
+GET http://localhost:8080/foo
+Content-Type: application/json
+Cookie: SESSION=2e058f24-cf1b-4954-9b5b-0489ea786779

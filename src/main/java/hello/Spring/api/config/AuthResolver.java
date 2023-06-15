@@ -1,27 +1,38 @@
 package hello.Spring.api.config;
 
 import hello.Spring.api.config.data.UserSession;
+import hello.Spring.api.domain.Session;
 import hello.Spring.api.exception.Unauthorized;
+import hello.Spring.api.repository.SessionRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * ArgumentResolver 확장해서 사용하는 방법
- *
+ * <p>
  * HandlerMethodArgumentResolver 구현하여 두개의 메소드를 확장한다.
- *
+ * <p>
  * supportsParameter 메소드는 Controller 메소드에 넘어온 파라미터 타입을 검증한다.
  */
 
+@Slf4j
+@RequiredArgsConstructor
 public class AuthResolver implements HandlerMethodArgumentResolver {
+
+    private final SessionRepository sessionRepository;
+
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.getParameterType().equals(UserSession.class);
     }
-
 
     /*
     Session 검증에서 데이터 베이스를 조회해서 사용자의 정보와 일지하는지
@@ -29,14 +40,26 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
      */
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-        String accessToken = webRequest.getHeader("Authorization");
-        if (accessToken == null || accessToken.equals("")) {
+        HttpServletRequest servletRequest = webRequest.getNativeRequest(HttpServletRequest.class);
+        if (servletRequest == null) {
+            log.error("servletRequest null");
             throw new Unauthorized();
         }
 
-        // 데이터 베이스를 조회해서 사용자의 값을 Session DTO 에 생성자 파라미터로 넘겨서
-        // 반환한다.
+        Cookie[] cookies = servletRequest.getCookies();
+        if (cookies.length == 0) {
+            log.error("Cookie null");
+            throw new Unauthorized();
+        }
 
-        return new UserSession(1L);
+        String accessToken = cookies[0].getValue();
+
+        // 데이터 베이스를 조회해서 사용자의 값을 Session DTO 에 생성자 파라미터로 넘겨서 반환한다.
+        Session session = sessionRepository.findByAccessToken(accessToken)
+                .orElseThrow(Unauthorized::new);
+
+        // 실제로 토큰값을 넘겨주는 것이 아니라 맴버와 토큰의 연관관계 매핑으로 인해서
+        // 세션정보에 담겨있는 멤버의 아이디를 넘겨준다.
+        return new UserSession(session.getMember().getId());
     }
 }
