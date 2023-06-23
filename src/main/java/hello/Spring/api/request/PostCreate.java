@@ -4,7 +4,7 @@ import hello.Spring.api.exception.InvalidRequest;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 /**
  * 서비스 정책에 맞는 요청 클래스를 사용

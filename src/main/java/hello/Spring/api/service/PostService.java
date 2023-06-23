@@ -1,6 +1,7 @@
 package hello.Spring.api.service;
 
 import hello.Spring.api.domain.Post;
+import hello.Spring.api.domain.PostEditor;
 import hello.Spring.api.exception.PostNotFound;
 import hello.Spring.api.repository.PostRepository;
 import hello.Spring.api.request.PostCreate;
@@ -57,20 +58,17 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(PostNotFound::new);
 
-        /**
-         * query dsl can not find symbol 에러 떠서 Editor builder 를 사용하지 못한다.
-         */
+
         // 아직 빌드되지 않은 PostEditor 를 반환한다. (현재 Post Entity 의 내용을 담음)
-//        PostEditor.PostEditorBuilder modifyPost = PostEditor.callEditor(postEdit);
+        PostEditor.PostEditorBuilder modifyPost = PostEditor.callEditor(postEdit);
 
         // 파라미터로 넘어온 postEdit(수정 내용을 담은 DTO)
         // PostEditor 내용을 변경
-//        PostEditor updatePost = modifyPost.build();
+        PostEditor updatePost = modifyPost.build();
 
-        System.out.println("hello world");
 
         // 실제 엔티티의 내용을 변경
-        post.editPost(postEdit);
+        post.editPost(updatePost);
         return new PostResponse(post);
     }
 

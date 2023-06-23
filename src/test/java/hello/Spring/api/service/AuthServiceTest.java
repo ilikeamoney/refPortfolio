@@ -1,17 +1,16 @@
 package hello.Spring.api.service;
 
-import hello.Spring.api.crypto.PasswordEncoder;
 import hello.Spring.api.domain.Member;
 import hello.Spring.api.exception.AlreadyExistEmailException;
-import hello.Spring.api.exception.InvalidSignInformation;
 import hello.Spring.api.repository.MemberRepository;
-import hello.Spring.api.request.Login;
 import hello.Spring.api.request.Signup;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,7 +27,7 @@ class AuthServiceTest {
     private AuthService authService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
 
     @AfterEach
     void deletePost() {
@@ -57,11 +56,12 @@ class AuthServiceTest {
         assertThat(findMember.getEmail())
                 .isEqualTo("2721000@naver.com");
 
+        assertThat(passwordEncoder
+                .matches("1234", findMember.getPassword()))
+                .isTrue();
+
         assertThat(findMember.getName())
                 .isEqualTo("짭종");
-
-        assertThat(passwordEncoder.equalsPassword(signup.getPassword(), findMember))
-                .isTrue();
 
         assertThat(findMember.getPassword())
                 .isNotNull();
@@ -88,57 +88,5 @@ class AuthServiceTest {
         // expected
         assertThatThrownBy(() -> authService.signup(signup))
                 .isInstanceOf(AlreadyExistEmailException.class);
-
-    }
-
-    @Test
-    @DisplayName("로그인 성공")
-    void loginSuccess() throws Exception {
-        // given
-        String encryptedPassword = passwordEncoder.encrypt("1234");
-
-
-        Member member = Member.builder()
-                .email("ilikeamoney@gmail.com")
-                .password(encryptedPassword)
-                .name("짭종")
-                .build();
-
-        memberRepository.save(member);
-
-        Login login = Login.builder()
-                .email("ilikeamoney@gmail.com")
-                .password("1234")
-                .build();
-
-        // when
-        Long memberId = authService.signInId(login);
-
-        // then
-        assertThat(memberId).isEqualTo(1L);
-    }
-
-    @Test
-    @DisplayName("로그인 비밀번호 불일치")
-    void loginFail() throws Exception {
-        // given
-        String encryptedPassword = passwordEncoder.encrypt("1234");
-
-        Member member = Member.builder()
-                .email("ilikeamoney@gmail.com")
-                .password(encryptedPassword)
-                .name("짭종")
-                .build();
-
-        memberRepository.save(member);
-
-        Login login = Login.builder()
-                .email("ilikeamoney@gmail.com")
-                .password("12345")
-                .build();
-
-        // expected
-        assertThatThrownBy(() -> authService.signInId(login))
-                .isInstanceOf(InvalidSignInformation.class);
     }
 }

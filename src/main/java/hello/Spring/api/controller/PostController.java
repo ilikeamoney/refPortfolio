@@ -1,6 +1,5 @@
 package hello.Spring.api.controller;
 
-import hello.Spring.api.config.data.UserSession;
 import hello.Spring.api.request.PostCreate;
 import hello.Spring.api.request.PostEdit;
 import hello.Spring.api.request.PostSearch;
@@ -10,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.net.http.HttpRequest;
+import jakarta.validation.Valid;
 import java.util.List;
 
 /**
@@ -39,18 +35,6 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
-
-    @GetMapping("/foo")
-    public Long foo(UserSession userSession) {
-        log.info(">>>{}", userSession.id);
-        return userSession.id;
-    }
-
-    @GetMapping("/bar")
-    public String bar() {
-        return "인증이 필요없는 페이지";
-    }
-
 
     @PostMapping("/posts")
     public void post(@RequestBody @Valid PostCreate request) {

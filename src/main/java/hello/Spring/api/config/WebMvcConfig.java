@@ -1,13 +1,8 @@
 package hello.Spring.api.config;
 
-import hello.Spring.api.repository.SessionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.util.List;
 
 /**
  * Spring Mvc 구성을 확장하고 싶은때는 WebMvcConfigurer 에 메소드를 오버라이딩 한다.
@@ -28,21 +23,5 @@ import java.util.List;
 @RequiredArgsConstructor
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final SessionRepository sessionRepository;
-
     private final AppConfig appConfig;
-
-    // 확장할 Interceptor 추가할때 구현하는 메소드
-//    @Override
-//    public void addInterceptors(InterceptorRegistry registry) {
-//        registry.addInterceptor(new AuthInterceptor())
-//                .excludePathPatterns("/error", "/favicon.ico");
-//    }
-
-
-    // 확장할 ArgumentResolver 추가할때 구현하는 메소드
-    @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(new AuthResolver(sessionRepository, appConfig));
-    }
 }

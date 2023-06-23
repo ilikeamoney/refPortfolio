@@ -6,17 +6,16 @@ import lombok.Data;
 @Data
 public class Signup {
 
+    private String email;
+
     private String password;
 
     private String name;
 
-    private String email;
-
-
     @Builder
-    public Signup(String password, String name, String email) {
+    public Signup(String email, String password, String name) {
+        this.email = email;
         this.password = password;
         this.name = name;
-        this.email = email;
     }
 }

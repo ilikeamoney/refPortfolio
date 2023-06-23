@@ -1,24 +1,28 @@
-### 로그인 쿠키 인증
+### 회원가입
+POST http://localhost:8080/auth/signup
+Content-Type: application/json
 
+{
+  "name" : "짭종",
+  "email": "ilikeamoney@naver.com",
+  "password": "1234"
+}
+
+
+### 로그인
 POST http://localhost:8080/auth/login
 Content-Type: application/json
 
 {
-  "email":"ilikeamoney@gmail.com",
+  "email": "ilikeamoney@naver.com",
   "password": "1234"
 }
 
-### 로그인 JWT 인증
+### 사용자 페이지
+GET http://localhost:8080/member
 
-POST http://localhost:8080/auth/login/1
-Content-Type: application/json
+### 관리자 페이지
+GET http://localhost:8080/admin
 
-{
-  "email":"ilikeamoney@gmail.com",
-  "password": "1234"
-}
-
-### 인증페이지 요청
-GET http://localhost:8080/foo
-Content-Type: application/json
-Cookie: SESSION=2e058f24-cf1b-4954-9b5b-0489ea786779
+### 메인 페이지
+GET http://localhost:8080
