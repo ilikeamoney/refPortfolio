@@ -2,6 +2,7 @@ package hello.Spring.api.controller;
 
 import hello.Spring.api.config.AppConfig;
 import hello.Spring.api.request.Login;
+import hello.Spring.api.request.Signup;
 import hello.Spring.api.response.SessionResponse;
 import hello.Spring.api.service.AuthService;
 import io.jsonwebtoken.Jwts;
@@ -76,7 +77,7 @@ public class AuthController {
         // 바이트 문자열로 변환
         String strKey = Base64.getEncoder().encodeToString(keyEncoded);
 
-        SecretKey secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(appConfig.getJwtKey()));
+        SecretKey secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(KEY));
 
         String jws = Jwts.builder()
                 .setSubject(String.valueOf(memberId))
@@ -85,6 +86,12 @@ public class AuthController {
                 .compact();
 
          return new SessionResponse(jws);
+    }
+
+
+    @PostMapping("/auth/signup")
+    public void signup(@RequestBody Signup signup) {
+        authService.signup(signup);
     }
 
 }

@@ -7,6 +7,7 @@ import hello.Spring.api.exception.InvalidSignInformation;
 import hello.Spring.api.repository.MemberRepository;
 import hello.Spring.api.repository.SessionRepository;
 import hello.Spring.api.request.Login;
+import hello.Spring.api.request.Signup;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -66,7 +68,7 @@ class AuthControllerTest {
 
         //when
         mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .content(json)
                 )
                 .andExpect(status().isOk())
@@ -91,7 +93,7 @@ class AuthControllerTest {
 
         //when
         mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .content(json)
                 )
                 .andExpect(status().isOk())
@@ -117,7 +119,7 @@ class AuthControllerTest {
 
         //when
         mockMvc.perform(post("/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(APPLICATION_JSON)
                         .content(json)
                 )
                 .andExpect(status().isOk())
@@ -141,7 +143,7 @@ class AuthControllerTest {
         // when
         mockMvc.perform(get("/foo")
                         .header("Authorization", session.getAccessToken())
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andDo(print());
 
@@ -163,9 +165,32 @@ class AuthControllerTest {
         // when
         mockMvc.perform(get("/foo")
                         .header("Authorization", session.getAccessToken() + "qwe1234")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(APPLICATION_JSON))
                 .andExpect(status().isUnauthorized())
                 .andDo(print());
+    }
 
+
+    @Test
+    @DisplayName("회원가입 요청")
+    void signup() throws Exception {
+        // given
+        Signup signup = Signup.builder()
+                .email("ilikeamoney@gmail.com")
+                .password("1234")
+                .name("짭종")
+                .build();
+
+        String json = objectMapper.writeValueAsString(signup);
+
+        // expected
+        mockMvc.perform(post("/auth/signup")
+                        .contentType(APPLICATION_JSON)
+                        .content(json))
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        Assertions.assertThat(memberRepository.count())
+                .isEqualTo(1L);
     }
 }

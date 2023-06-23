@@ -34,6 +34,8 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
 
     private final SessionRepository sessionRepository;
 
+    private static final String KEY = "mK+hkhNo4/OwqHzOy2x/EZ4QYgmCZIseZuqhYsqtm14=";
+
     private final AppConfig appConfig;
 
     @Override
@@ -56,7 +58,7 @@ public class AuthResolver implements HandlerMethodArgumentResolver {
         // Base64 는 String -> Byte, Byte -> String 으로 바꿔주는 라이브러리 이다.
         try {
             Jws<Claims> claimsJws = Jwts.parserBuilder()
-                    .setSigningKey(appConfig.getJwtKey())
+                    .setSigningKey(KEY)
                     .build()
                     .parseClaimsJws(jws);
 
